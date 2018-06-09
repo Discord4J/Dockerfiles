@@ -14,3 +14,8 @@ cd ../database/
 docker build -t database .
 docker tag database austinv11/discord4j:database
 docker push austinv11/discord4j:database
+
+cd ../confluence/
+docker build -t confluence .
+docker tag confluence austinv11/discord4j:confluence
+docker push austinv11/discord4j:confluence
