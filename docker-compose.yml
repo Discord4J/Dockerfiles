@@ -33,6 +33,7 @@ services:
 #      - 3456:3456
       - 4567:4567
       - 5678:5678
+#      - 9000:9000
 
   database:
     image: austinv11/discord4j:database
@@ -75,5 +76,19 @@ services:
     ports:
       - 1234:8080
 
+  portainer:
+    depends_on:
+      - nginx
+    image: portainer/portainer
+    restart: always
+    ports:
+      - 9000:9000
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+
 volumes:
   frontend-data:
+  portainer_data:
