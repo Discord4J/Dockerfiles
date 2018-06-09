@@ -28,7 +28,7 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 1234:1234
+#      - 1234:1234
 #      - 2345:2345
 #      - 3456:3456
       - 4567:4567
@@ -54,8 +54,8 @@ services:
     #build confluence
     restart: always
     ports:
-      - 8090:3456
-      - 8091:3457
+      - 3456:8090
+      - 3457:8091
 
   jira:
     depends_on:
@@ -65,7 +65,15 @@ services:
     #build jira
     restart: always
     ports:
-      - 8080:2345
+      - 2345:8080
+
+  jenkins:
+    depends_on:
+      - nginx
+    image: jenkinsci/blueocean:1.5.0
+    restart: always
+    ports:
+      - 1234:8080
 
 volumes:
   frontend-data:
