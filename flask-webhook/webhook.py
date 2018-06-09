@@ -30,17 +30,18 @@ def ping():
     global HOST_ADDRESS
 
     if HOST_ADDRESS is not None:  # Only collect once!
+        print("Ping attempted despite having an established address!", flush=True)
         abort(404)
     else:
         matches = IP_REGEX.findall(request.remote_addr)
         if len(matches) > 0:
             HOST_ADDRESS = matches[0]
         else:
-            print("Unable to parse ip from %s!" % request.remote_addr)
+            print("Unable to parse ip from %s!" % request.remote_addr, flush=True)
             abort(500)
-        print("Using pinged address:")
-        print(HOST_ADDRESS)
-        print("Confirming configuration...")
+        print("Using pinged address:", flush=True)
+        print(HOST_ADDRESS, flush=True)
+        print("Confirming configuration...", flush=True)
         status_code = None
         try:
             status_code = requests.get(HOST_ADDRESS + "/docker", params={'container': get_container_info()}).status_code
@@ -49,16 +50,18 @@ def ping():
         if status_code == 200:
             return "OK"
         else:
-            print("Invalid confirmation! Forgetting address...")
+            print("Invalid confirmation! Forgetting address...", flush=True)
             HOST_ADDRESS = None
             abort(403)
 
 
 def signal_self_update():
+    print("Signalling for a webhook container update...", flush=True)
     requests.post(HOST_ADDRESS + "/docker", json={'container': get_container_info(), 'op': 'self_update'})
 
 
 def call(cmd):
+    print("Signalling for command execution...", flush=True)
     requests.post(HOST_ADDRESS + "/docker", json={'container': get_container_info(), 'op': 'cmd', 'payload': cmd})
 
 
@@ -71,6 +74,7 @@ def docker():
         tag = payload['push_data']['tag']
         repo_name = payload['repository']['repo_name']
         formatted_name = "%s:%s" % (repo_name, tag)
+        print("Update detected for %s" % formatted_name, flush=True)
         services, old_raw_services = read_services()
         raw_services = old_raw_services
         target = None
@@ -86,16 +90,18 @@ def docker():
                 services, raw_services = read_services()
             if target is None and mark_for_rebuild:
                 abort(501)
-                print("Unused image was pushed! Are you sure the docker-compose.yml is up to date?")
+                print("Unused image was pushed! Are you sure the docker-compose.yml is up to date?", flush=True)
                 return
             else:
                 break
         if raw_services == old_raw_services:
+            print("Single image update...", flush=True)
             if target.name == SERVICE_NAME:
                 signal_self_update()
             else:
                 update_services(frozenset(target), frozenset(), frozenset(), services)
         else:
+            print("docker-compose.yml update...", flush=True)
             update_self = False
             if target.name == SERVICE_NAME:
                 update_self = True
@@ -152,25 +158,19 @@ def read_services() -> Tuple[List[Service], Dict[str, Any]]:
 
 
 def update_repo():
+    print("Updating the local meta repo clone...", flush=True)
     call("git fetch --all")
     call("git reset --hard origin/master")
 
 
 def update_services(changed_services: Set[Service], added_services: Set[Service], removed_services: Set[Service], all_services: List[Service]):
     @functools.lru_cache(maxsize=64)
-    def get_deps(service: Service) -> Set[Service]:
+    def get_dependents(service: Service) -> Set[Service]:
         deps = set()
-        for dep in service.requires:
-            real_dep = None
-            for service_ in all_services:
-                if real_dep is not None:
-                    continue
-                if service_.name == dep:
-                    real_dep = service_
-            if real_dep is None:
-                raise Exception("Unable to locate dependency %s!" % dep)
-            deps.add(real_dep)
-            deps |= get_deps(real_dep)
+        for dep in all_services:
+            if service.name in dep.requires:
+                deps.add(dep)
+                deps |= get_dependents(dep)
         return deps
 
     updated_services = set()
@@ -179,16 +179,16 @@ def update_services(changed_services: Set[Service], added_services: Set[Service]
         global SERVICE_NAME
         for s in services:
             if s not in installed_services:
-                deps = get_deps(s)
+                deps = get_dependents(s)
                 for dep in deps:
-                    if dep in installed_services:
-                        continue
-                    call("docker-compose pause -d --no-deps %s" % dep.name)
-                installed_services |= deps
+                    call("docker-compose pause %s" % dep.name)
                 call("docker-compose up -d --no-deps --force-recreate %s" % s.name)
+                for dep in deps:
+                    call("docker-compose unpause %s" % dep.name)
                 installed_services.add(s)
         return installed_services
 
+    print("Updating %s services..." % str(len(changed_services) + len(added_services) + len(removed_services)), flush=True)
     updated_services = update_all(changed_services, updated_services)
     update_all(added_services, updated_services)
     for removed in removed_services:
@@ -196,6 +196,7 @@ def update_services(changed_services: Set[Service], added_services: Set[Service]
 
 
 def update_cluster():  # TODO: Do rolling updates instead somehow
+    print("Updating the local cluster...", flush=True)
     call("docker-compose up -d --remove-orphans")
 
 
