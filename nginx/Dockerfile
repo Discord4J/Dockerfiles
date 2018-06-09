@@ -5,7 +5,6 @@ ADD nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 EXPOSE 443
-EXPOSE 8080
 EXPOSE 1234
 EXPOSE 2345
 EXPOSE 3456

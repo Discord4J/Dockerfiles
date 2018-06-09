@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Dockerfiles.iml" filepath="$PROJECT_DIR$/Dockerfiles.iml" />
       <module fileurl="file://$PROJECT_DIR$/confluence/confluence.iml" filepath="$PROJECT_DIR$/confluence/confluence.iml" />
       <module fileurl="file://$PROJECT_DIR$/database/database.iml" filepath="$PROJECT_DIR$/database/database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jira/jira.iml" filepath="$PROJECT_DIR$/jira/jira.iml" />
       <module fileurl="file://$PROJECT_DIR$/nginx/nginx.iml" filepath="$PROJECT_DIR$/nginx/nginx.iml" />
       <module fileurl="file://$PROJECT_DIR$/web-frontend/web-frontend.iml" filepath="$PROJECT_DIR$/web-frontend/web-frontend.iml" />
     </modules>

@@ -1,43 +1,65 @@
-# Modified atlassian confluence Dockerfile, it uses oracle jdk instead of openjdk and a couple config specific changes
-# https://confluence.atlassian.com/confkb/update-the-confluence-docker-image-to-use-oracle-jdk-829062521.html
-FROM anapsix/alpine-java:8_jdk
-MAINTAINER Atlassian Confluence
+# Most of this dockerfile is taken from here: https://hub.docker.com/r/cptactionhank/atlassian-confluence/~/dockerfile/
+# This is because atlassian images aren't very good and i needed to replace mysql support with postgres
+FROM openjdk:8-alpine
 
-ENV RUN_USER            daemon
-ENV RUN_GROUP           daemon
+# Setup useful environment variables
+ENV CONF_HOME     /var/atlassian/confluence
+ENV CONF_INSTALL  /opt/atlassian/confluence
+ENV CONF_VERSION  6.9.1
 
-# https://confluence.atlassian.com/doc/confluence-home-and-other-important-directories-590259707.html
-ENV CONFLUENCE_HOME          /var/atlassian/application-data/confluence
-ENV CONFLUENCE_INSTALL_DIR   /opt/atlassian/confluence
+ENV JAVA_CACERTS  $JAVA_HOME/jre/lib/security/cacerts
+ENV CERTIFICATE   $CONF_HOME/certificate
 
-ENV JVM_MINIMUM_MEMORY 1024m
-ENV JVM_MAXIMUM_MEMORY 4096m
+# Install Atlassian Confluence and helper tools and setup initial home
+# directory structure.
+RUN set -x \
+    && apk --no-cache add curl xmlstarlet bash ttf-dejavu libc6-compat \
+    && mkdir -p                "${CONF_HOME}" \
+    && chmod -R 700            "${CONF_HOME}" \
+    && chown daemon:daemon     "${CONF_HOME}" \
+    && mkdir -p                "${CONF_INSTALL}/conf" \
+    && curl -Ls                "https://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-${CONF_VERSION}.tar.gz" | tar -xz --directory "${CONF_INSTALL}" --strip-components=1 --no-same-owner \
+    && curl -Ls                "https://jdbc.postgresql.org/download/postgresql-42.2.2.jar" -o "${CONF_INSTALL}/confluence/WEB-INF/lib/postgresql-42.2.2.jar" \
+    && chmod -R 700            "${CONF_INSTALL}/conf" \
+    && chmod -R 700            "${CONF_INSTALL}/temp" \
+    && chmod -R 700            "${CONF_INSTALL}/logs" \
+    && chmod -R 700            "${CONF_INSTALL}/work" \
+    && chown -R daemon:daemon  "${CONF_INSTALL}/conf" \
+    && chown -R daemon:daemon  "${CONF_INSTALL}/temp" \
+    && chown -R daemon:daemon  "${CONF_INSTALL}/logs" \
+    && chown -R daemon:daemon  "${CONF_INSTALL}/work" \
+    && echo -e                 "\nconfluence.home=$CONF_HOME" >> "${CONF_INSTALL}/confluence/WEB-INF/classes/confluence-init.properties" \
+    && xmlstarlet              ed --inplace \
+        --delete               "Server/@debug" \
+        --delete               "Server/Service/Connector/@debug" \
+        --delete               "Server/Service/Connector/@useURIValidationHack" \
+        --delete               "Server/Service/Connector/@minProcessors" \
+        --delete               "Server/Service/Connector/@maxProcessors" \
+        --delete               "Server/Service/Engine/@debug" \
+        --delete               "Server/Service/Engine/Host/@debug" \
+        --delete               "Server/Service/Engine/Host/Context/@debug" \
+                               "${CONF_INSTALL}/conf/server.xml" \
+    && touch -d "@0"           "${CONF_INSTALL}/conf/server.xml" \
+    && chown daemon:daemon     "${JAVA_CACERTS}"
 
-VOLUME ["${CONFLUENCE_HOME}"]
+# Use the default unprivileged account. This could be considered bad practice
+# on systems where multiple processes end up being executed by 'daemon' but
+# here we only ever run one process anyway.
+USER daemon:daemon
 
-# Expose HTTP and Synchrony ports
-EXPOSE 8090
-EXPOSE 8091
+# Expose default HTTP connector port.
+EXPOSE 8090 8091
 
-WORKDIR $CONFLUENCE_HOME
+# Set volume mount points for installation and home directory. Changes to the
+# home directory needs to be persisted as well as parts of the installation
+# directory due to eg. logs.
+VOLUME ["/var/atlassian/confluence", "/opt/atlassian/confluence/logs"]
 
-CMD ["/entrypoint.sh", "-fg"]
-ENTRYPOINT ["/sbin/tini", "--"]
+# Set the default working directory as the Confluence home directory.
+WORKDIR /var/atlassian/confluence
 
-RUN apk update -qq \
-    && apk add ca-certificates wget curl openssh bash procps openssl perl ttf-dejavu tini \
-    && update-ca-certificates \
-    && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
-COPY entrypoint.sh              /entrypoint.sh
-
-ARG CONFLUENCE_VERSION=6.3.3
-ARG DOWNLOAD_URL=http://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-${CONFLUENCE_VERSION}.tar.gz
-
-COPY . /tmp
-
-RUN mkdir -p                             ${CONFLUENCE_INSTALL_DIR} \
-    && curl -L --silent                  ${DOWNLOAD_URL} | tar -xz --strip-components=1 -C "$CONFLUENCE_INSTALL_DIR" \
-    && chown -R ${RUN_USER}:${RUN_GROUP} ${CONFLUENCE_INSTALL_DIR}/ \
-    && sed -i -e 's/-Xms\([0-9]\+[kmg]\) -Xmx\([0-9]\+[kmg]\)/-Xms\${JVM_MINIMUM_MEMORY:=\1} -Xmx\${JVM_MAXIMUM_MEMORY:=\2} \${JVM_SUPPORT_RECOMMENDED_ARGS} -Dconfluence.home=\${CONFLUENCE_HOME}/g' ${CONFLUENCE_INSTALL_DIR}/bin/setenv.sh \
-    && sed -i -e 's/port="8090"/port="8090" secure="${catalinaConnectorSecure}" scheme="${catalinaConnectorScheme}" proxyName="${catalinaConnectorProxyName}" proxyPort="${catalinaConnectorProxyPort}"/' ${CONFLUENCE_INSTALL_DIR}/conf/server.xml
+# Run Atlassian Confluence as a foreground process by default.
+CMD ["/opt/atlassian/confluence/bin/start-confluence.sh", "-fg"]

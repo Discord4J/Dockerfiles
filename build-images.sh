@@ -19,3 +19,8 @@ cd ../confluence/
 docker build -t confluence .
 docker tag confluence austinv11/discord4j:confluence
 docker push austinv11/discord4j:confluence
+
+cd ../jira/
+docker build -t jira .
+docker tag jira austinv11/discord4j:jira
+docker push austinv11/discord4j:jira
