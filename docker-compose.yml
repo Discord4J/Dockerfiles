@@ -34,6 +34,7 @@ services:
       - 4567:4567
       - 5678:5678
 #      - 9000:9000
+#      - 2314:2314
 
   database:
     image: austinv11/discord4j:database
@@ -87,6 +88,14 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+
+  webhook:
+    depends_on:
+      - nginx
+    image: austinv11/discord4j:webhook
+    restart: always
+    ports:
+      - 2314:2314
 
 
 volumes:

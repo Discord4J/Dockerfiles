@@ -40,5 +40,10 @@ docker-compose --version
 echo "Installing docker completions..."
 curl -L https://raw.githubusercontent.com/docker/compose/1.21.2/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
 
+echo "Installing some required python dependencies..."
+apt install python3-pip
+pip install virtualenv
+virtualenv env
+
 echo "Done!"
 exit 0

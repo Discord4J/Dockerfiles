@@ -24,3 +24,8 @@ cd ../jira/
 docker build -t jira .
 docker tag jira austinv11/discord4j:jira
 docker push austinv11/discord4j:jira
+
+cd ../flask-webhook/
+docker build -t webhook .
+docker tag webhook austinv11/discord4j:webhook
+docker push austinv11/discord4j:webhook
