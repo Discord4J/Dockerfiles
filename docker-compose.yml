@@ -1,7 +1,18 @@
 version: "3.6"
 services:
+#  frontend:
+#    image: austinv11/discord4j:web-frontend
+##    build: web-frontend
+#    volumes:
+#      - type: volume
+#        source: frontend-data
+#        target: /dist/
+#        read_only: false
+#        volume:
+#          nocopy: false
+##    restart: always Spams the logs if we do this
   frontend:
-    image: austinv11/discord4j:web-frontend
+    image: austinv11/discord4j:web-old
 #    build: web-frontend
     volumes:
       - type: volume
@@ -31,7 +42,7 @@ services:
 #      - 1234:1234
 #      - 2345:2345
 #      - 3456:3456
-      - 4567:4567
+#      - 4567:4567
 #      - 5678:5678
 #      - 9000:9000
 #      - 2314:2314
