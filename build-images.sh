@@ -5,6 +5,11 @@ docker build -t web-frontend .
 docker tag web-frontend austinv11/discord4j:web-frontend
 docker push austinv11/discord4j:web-frontend
 
+cd ./web-old/
+docker build -t web-old .
+docker tag web-old austinv11/discord4j:web-old
+docker push austinv11/discord4j:web-old
+
 cd ../nginx/
 docker build -t nginx .
 docker tag nginx austinv11/discord4j:nginx
