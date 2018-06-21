@@ -97,41 +97,6 @@ services:
     ports:
       - 2314:2314
 
-  wikidb:
-    image: mongo
-    expose:
-      - 27017
-    command: '--smallfiles --bind_ip wikidb'
-    environment:
-      - 'MONGO_LOG_DIR=/dev/null'
-    volumes:
-      - ./data/mongo:/data/db
-
-  wiki:
-    depends_on:
-      - wikidb
-      - nginx
-    image: 'requarks/wiki:latest'
-    links:
-      - wikidb
-    ports:
-      - 5678:3000
-    environment:
-      - WIKI_ADMIN_EMAIL: "${WIKI_ADMIN_EMAIL}"
-      - GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID}"
-      - GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET}"
-      - MICROSOFT_CLIENT_ID: "${MICROSOFT_CLIENT_ID}"
-      - MICROSOFT_CLIENT_SECRET: "${MICROSOFT_CLIENT_SECRET}"
-      - GITHUB_CLIENT_ID: "${GITHUB_CLIENT_ID}"
-      - GITHUB_CLIENT_SECRET: "${GITHUB_CLIENT_SECRET}"
-      - SESSION_SECRET: "${SESSION_SECRET}"
-      - GIT_USER_NAME: "${GIT_USER_NAME}"
-      - GIT_PASSWORD: "${GIT_PASSWORD}"
-      - GIT_EMAIL: "${GIT_EMAIL}"
-    volumes:
-      - ./wiki/config.yml:/var/wiki/config.yml
-
-
 volumes:
   frontend-data:
   portainer_data:
