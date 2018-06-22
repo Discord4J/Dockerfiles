@@ -26,7 +26,7 @@ services:
   nginx:
     depends_on:
       - frontend
-    image: austinv11/discord4j:nginx-nossl # nossl for testing
+    image: austinv11/discord4j:nginx #-nossl # nossl for testing
 #    build: nginx
     volumes:
       - type: volume
@@ -55,9 +55,11 @@ services:
 #      - 5432:5432
     # Don't forget to set these environment variables!
     environment:
-      POSTGRES_PASSWORD: "$POSTGRES_PASSWORD"
+#      POSTGRES_PASSWORD: "$POSTGRES_PASSWORD"
       POSTGRES_USER: "postgres"
       PGDATA: "/var/lib/postgresql/data"
+    volumes:
+      - ../postgres_data/:/var/lib/postgresql/data
 
   confluence:
     depends_on:
@@ -69,6 +71,8 @@ services:
     ports:
       - 3456:8090
       - 3457:8091
+    volumes:
+      - ../confluence_data/confluence/:/var/atlassian/confluence
 
   jira:
     depends_on:
@@ -79,6 +83,8 @@ services:
     restart: always
     ports:
       - 2345:8080
+    volumes:
+      - ../jira_data/jira/:/var/atlassian/jira
 
   jenkins:
     depends_on:
@@ -87,6 +93,8 @@ services:
     restart: always
     ports:
       - 1234:8080
+    volumes:
+      - ../jenkins_data/:/var/jenkins_home
 
   portainer:
     depends_on:
@@ -98,7 +106,7 @@ services:
     command: -H unix:///var/run/docker.sock
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - ../portainer_data/:/data
 
   webhook:
     depends_on:
@@ -110,4 +118,3 @@ services:
 
 volumes:
   frontend-data:
-  portainer_data:
