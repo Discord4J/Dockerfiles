@@ -47,6 +47,8 @@ services:
 #      - 5678:5678
 #      - 9000:9000
 #      - 2314:2314
+    networks:
+     nginx-net:
 
   database:
     image: postgres
@@ -61,6 +63,8 @@ services:
       PGDATA: "/var/lib/postgresql/data"
     volumes:
       - ../postgres_data/:/var/lib/postgresql/data
+    networks:
+     db-net:
 
   confluence:
     depends_on:
@@ -74,6 +78,9 @@ services:
       - 3457:8091
     volumes:
       - ../confluence_data/confluence/:/var/atlassian/confluence
+    networks:
+     nginx-net:
+     db-net:
 
   jira:
     depends_on:
@@ -86,6 +93,9 @@ services:
       - 2345:8080
     volumes:
       - ../jira_data/jira/:/var/atlassian/jira
+    networks:
+     nginx-net:
+     db-net:
 
   jenkins:
     depends_on:
@@ -96,6 +106,8 @@ services:
       - 1234:8080
     volumes:
       - ../jenkins_data/:/var/jenkins_home
+    networks:
+     nginx-net:
 
   portainer:
     depends_on:
@@ -108,6 +120,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ../portainer_data/:/data
+    networks:
+     nginx-net:
 
   webhook:
     depends_on:
@@ -119,3 +133,6 @@ services:
 
 volumes:
   frontend-data:
+networks:
+  nginx-net:
+  db-net:
