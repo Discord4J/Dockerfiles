@@ -65,37 +65,37 @@ services:
       - ../postgres_data/:/var/lib/postgresql/data
     networks:
      db-net:
-
-  confluence:
-    depends_on:
-      - database
-    image: austinv11/discord4j:confluence
-    #build confluence
-    restart: always
-    ports:
-      - 3456:8090
-      - 3457:8091
-    volumes:
-      - ../confluence_data/confluence:/var/atlassian/confluence
-      - ../confluence_data/conf:/opt/atlassian/confluence/conf
-    networks:
-     nginx-net:
-     db-net:
-
-  jira:
-    depends_on:
-      - database
-    image: austinv11/discord4j:jira
-    #build jira
-    restart: always
-    ports:
-      - 2345:8080
-    volumes:
-      - ../jira_data/jira/:/var/atlassian/jira
-      - ../jira_data/conf:/opt/atlassian/jira/conf
-    networks:
-     nginx-net:
-     db-net:
+#
+#  confluence:
+#    depends_on:
+#      - database
+#    image: austinv11/discord4j:confluence
+#    #build confluence
+#    restart: always
+#    ports:
+#      - 3456:8090
+#      - 3457:8091
+#    volumes:
+#      - ../confluence_data/confluence:/var/atlassian/confluence
+#      - ../confluence_data/conf:/opt/atlassian/confluence/conf
+#    networks:
+#     nginx-net:
+#     db-net:
+#
+#  jira:
+#    depends_on:
+#      - database
+#    image: austinv11/discord4j:jira
+#    #build jira
+#    restart: always
+#    ports:
+#      - 2345:8080
+#    volumes:
+#      - ../jira_data/jira/:/var/atlassian/jira
+#      - ../jira_data/conf:/opt/atlassian/jira/conf
+#    networks:
+#     nginx-net:
+#     db-net:
 
   jenkins:
     image: jenkinsci/blueocean:1.5.0
