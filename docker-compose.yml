@@ -69,7 +69,6 @@ services:
   confluence:
     depends_on:
       - database
-      - nginx
     image: austinv11/discord4j:confluence
     #build confluence
     restart: always
@@ -85,7 +84,6 @@ services:
   jira:
     depends_on:
       - database
-      - nginx
     image: austinv11/discord4j:jira
     #build jira
     restart: always
@@ -98,8 +96,6 @@ services:
      db-net:
 
   jenkins:
-    depends_on:
-      - nginx
     image: jenkinsci/blueocean:1.5.0
     restart: always
     ports:
@@ -110,8 +106,6 @@ services:
      nginx-net:
 
   portainer:
-    depends_on:
-      - nginx
     image: portainer/portainer
     restart: always
     ports:
