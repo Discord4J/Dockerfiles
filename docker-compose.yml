@@ -48,7 +48,7 @@ services:
 #      - 2314:2314
 
   database:
-    image: austinv11/discord4j:database
+    image: postgres
     #build: database
     restart: always
 #    ports:
