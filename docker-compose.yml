@@ -97,16 +97,64 @@ services:
 #     nginx-net:
 #     db-net:
 
-  jenkins:
-    image: jenkinsci/blueocean:1.5.0
+  ci:
+    image: drone/drone:0.8.5
     restart: always
     ports:
-      - 1234:8080
+      - 1234:8000
+      - 9000
     volumes:
-      - ../jenkins_data/:/var/jenkins_home
+      - ../drone_data/:/var/lib/drone/
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_OPEN=true
+      - DRONE_HOST=https://ci.discord4j.com
+      - DRONE_GITHUB=true
+      - DRONE_ORGS=discord4j,discord4j-addons
+      - DRONE_ADMIN=austinv11
+      - DRONE_GITHUB_CLIENT=${DRONE_GITHUB_CLIENT} # Stuff from manually created gh OAuth app
+      - DRONE_GITHUB_SECRET=${DRONE_GITHUB_SECRET}
+      - DRONE_SECRET=${DRONE_SECRET} # Arbitrary secret for internal communication
+      - DRONE_DATABASE_DRIVE=postgres
+      - DRONE_DATABASE_DATASOURCE=postgres://postgres@database:5432/postgres?sslmode=disable
     networks:
      nginx-net:
+     drone-net:
+     db-net:
+
+# 2 drone agents capable of running 4 parallel builds, each
+
+  drone-agent1:
+    image: drone/agent:0.8.5
+
+    command: agent
+    restart: always
+    depends_on:
+      - ci
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER=ci:9000
+      - DRONE_SECRET=${DRONE_SECRET}
+      - DRONE_MAX_PROCS=4
+    networks:
+      drone-net:
+
+  drone-agent2:
+    image: drone/agent:0.8.5
+
+    command: agent
+    restart: always
+    depends_on:
+      - ci
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER=ci:9000
+      - DRONE_SECRET=${DRONE_SECRET}
+      - DRONE_MAX_PROCS=4
+    networks:
+      drone-net:
 
   portainer:
     image: portainer/portainer
@@ -133,3 +181,4 @@ volumes:
 networks:
   nginx-net:
   db-net:
+  drone-net:

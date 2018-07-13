@@ -18,3 +18,6 @@ this can be achieved by running `install.sh`
 If you just want to rebuild, simply adapt that script by 
 commenting out the `docker push xx` lines.
 3. To start the server, run `launch.sh`.
+
+Additionally, you should create a `.env` file which defines
+environment variables.
