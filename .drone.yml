@@ -3,7 +3,7 @@ pipeline:
     image: docker
     secrets: [ docker_username, docker_password ]
     commands:
-      - dockerd -H unix://~/local_docker.sock &
+      - dockerd -H unix://~/local_docker.sock
       - export DOCKER_HOST="unix://~/local_docker.sock"
       - docker login -u "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
       - ./build-images.sh
