@@ -34,3 +34,13 @@ cd ../flask-webhook/
 docker build -t webhook .
 docker tag webhook austinv11/discord4j:webhook
 docker push austinv11/discord4j:webhook
+
+cd ../gradle/
+python3 ./dockerfile_generate.py
+for f in Dockerfile.*; do
+    extension=`sed 's/^\w\+.//' <<< "$f"`
+    docker build -t gradle-${extension}
+    docker tag gradle-${extension} austinv11/gradle:${extension}
+    docker push austinv11/gradle:${extension}
+    rm -f f
+done
