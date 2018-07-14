@@ -23,6 +23,7 @@ RUN set -o errexit -o nounset \
 	&& echo "Installing Gradle" \
 	&& unzip gradle.zip \
 	&& rm gradle.zip \
+	&& mkdir "${GRADLE_HOME}"
 	&& mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}/" \
 	&& ln --symbolic "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle \
 	\
