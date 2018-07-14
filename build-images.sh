@@ -39,8 +39,8 @@ cd ../gradle/
 python3 ./dockerfile_generate.py
 for f in Dockerfile.*; do
     extension=`sed 's/^\w\+.//' <<< "$f"`
-    docker build -t gradle-${extension} --file ~/Dockerfiles/gradle/ .
+    docker build -t gradle-${extension} . --file ${f}
     docker tag gradle-${extension} austinv11/gradle:${extension}
     docker push austinv11/gradle:${extension}
-    rm -f f
+    rm -f ${f}
 done
