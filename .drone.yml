@@ -1,0 +1,7 @@
+pipeline:
+  deploy:
+    image: docker
+    secrets: [ docker_username, docker_password ]
+    commands:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - ./build-images.sh
