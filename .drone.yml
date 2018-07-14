@@ -3,5 +3,5 @@ pipeline:
     image: docker
     secrets: [ docker_username, docker_password ]
     commands:
-      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker login -u "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
       - ./build-images.sh
