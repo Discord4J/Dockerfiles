@@ -38,7 +38,7 @@ services:
           nocopy: false
       - type: volume
         source: frontend-data-new
-        target: /var/www/html/new/
+        target: /new_site/
         read_only: true
         volume:
           nocopy: false

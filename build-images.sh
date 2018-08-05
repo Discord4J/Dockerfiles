@@ -24,3 +24,5 @@ cd ../flask-webhook/
 docker build -t webhook .
 docker tag webhook austinv11/discord4j:webhook
 docker push austinv11/discord4j:webhook
+
+cd ..
