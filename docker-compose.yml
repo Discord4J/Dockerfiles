@@ -1,17 +1,17 @@
 version: "3.6"
 services:
-#  frontend:
-#    image: austinv11/discord4j:web-frontend
-##    build: web-frontend
-#    volumes:
-#      - type: volume
-#        source: frontend-data
-#        target: /dist/
-#        read_only: false
-#        volume:
-#          nocopy: false
-##    restart: always Spams the logs if we do this
   frontend:
+    image: austinv11/discord4j:web-frontend
+#    build: web-frontend
+    volumes:
+      - type: volume
+        source: frontend-data-new
+        target: /dist/
+        read_only: false
+        volume:
+          nocopy: false
+#    restart: always Spams the logs if we do this
+  frontend-old:
     image: austinv11/discord4j:web-old
 #    build: web-frontend
     volumes:
@@ -26,12 +26,19 @@ services:
   nginx:
     depends_on:
       - frontend
+      - frontend-old
     image: austinv11/discord4j:nginx #-nossl # nossl for testing
 #    build: nginx
     volumes:
       - type: volume
         source: frontend-data
         target: /var/www/html/
+        read_only: true
+        volume:
+          nocopy: false
+      - type: volume
+        source: frontend-data-new
+        target: /var/www/html/new/
         read_only: true
         volume:
           nocopy: false
@@ -147,6 +154,7 @@ services:
 
 volumes:
   frontend-data:
+  frontend-data-new:
 networks:
   nginx-net:
   db-net:
