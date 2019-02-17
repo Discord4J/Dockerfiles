@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 
-cd ./web-frontend/
+ 
+#cd ./web-frontend/
+#docker build -t web-frontend .
+#docker tag web-frontend austinv11/discord4j:web-frontend
+#docker push austinv11/discord4j:web-frontend
+
+# Expecting the discord4j-web repo to be cloned in the parent dir!
+cd ../discord4j-web
 docker build -t web-frontend .
 docker tag web-frontend austinv11/discord4j:web-frontend
 docker push austinv11/discord4j:web-frontend
+
+cd ../Dockerfiles
 
 cd ./web-old/
 docker build -t web-old .
