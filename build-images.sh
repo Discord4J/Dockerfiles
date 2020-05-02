@@ -34,4 +34,9 @@ docker build -t webhook .
 docker tag webhook austinv11/discord4j:webhook
 docker push austinv11/discord4j:webhook
 
+cd ../internal-api/
+docker build -t github .
+docker tag github austinv11/discord4j:github
+docker push austinv11/discord4j:github
+
 cd ..

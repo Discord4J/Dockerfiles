@@ -152,6 +152,18 @@ services:
     ports:
       - 2314:2314
 
+  github:
+    depends_on:
+      - nginx
+    image: austinv11/discord4j:github
+    restart: always
+    ports:
+      - 7667:7667
+    environment:
+      - ACCESS_TOKEN=${ACCESS_TOKEN}
+    networks:
+      nginx-net:
+
 volumes:
   frontend-data:
   frontend-data-new:
