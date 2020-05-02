@@ -10,4 +10,4 @@ EXPOSE 7667
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["gunicorn", "-b", "localhost:7667", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:7667", "app:app"]

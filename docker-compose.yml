@@ -157,8 +157,8 @@ services:
       - nginx
     image: austinv11/discord4j:github
     restart: always
-    ports:
-      - 7667:7667
+    expose:
+      - 7667
     environment:
       - ACCESS_TOKEN=${ACCESS_TOKEN}
     networks:
