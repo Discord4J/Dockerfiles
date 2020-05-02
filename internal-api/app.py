@@ -11,12 +11,17 @@ github = Github(os.environ.get('ACCESS_TOKEN'))
 @app.route("/versions", methods=["GET"])
 def handle():
     repo = github.get_repo("Discord4J/Discord4J")
-    releases = dict()
+    releases = list()
     for release in repo.get_releases():
-        releases[release.tag_name] = {
+        releases.append({
+            "tag": release.tag_name,
             "title": release.title,
             "prerelease": release.prerelease,
             "url": release.url
-        }
+        })
 
-    return jsonify(reversed(releases))
+    return jsonify(releases)
+
+
+if __name__ == '__main__':
+    app.run('0.0.0.0')
