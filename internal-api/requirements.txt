@@ -2,3 +2,4 @@ flask
 PyGithub
 gunicorn
 Flask-Caching
+flask-cors

@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, jsonify
 from flask_caching import Cache
+from flask_cors import CORS
 from github import Github
 
 config = {
@@ -10,6 +11,7 @@ config = {
 }
 
 app = Flask(__name__)
+CORS(app, origins='*')
 app.config.from_mapping(config)
 cache = Cache(app)
 
