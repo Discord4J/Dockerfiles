@@ -11,7 +11,7 @@ config = {
 }
 
 app = Flask(__name__)
-CORS(app, origins='*')
+CORS(app, origins='https://discord4j.com')
 app.config.from_mapping(config)
 cache = Cache(app)
 
